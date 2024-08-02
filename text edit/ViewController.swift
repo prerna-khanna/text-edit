@@ -6,8 +6,11 @@
 //
 
 import UIKit
+import CoreMotion
 
 class ViewController: UIViewController, UITextFieldDelegate {
+    
+    private let motionManager = CMMotionManager()
 
     @IBOutlet weak var userIdTextField: UITextField!
     @IBOutlet weak var recordSwitch: UISwitch!
@@ -15,6 +18,10 @@ class ViewController: UIViewController, UITextFieldDelegate {
     @IBOutlet weak var userInputTextField: UITextField!
     @IBOutlet weak var optionSlider: UISlider!
     @IBOutlet weak var sliderValueLabel: UILabel!
+    
+    @IBOutlet weak var label1: UILabel!
+    @IBOutlet weak var label2: UILabel!
+    @IBOutlet weak var label3: UILabel!
 
     var isRecording = false
     var touchCoordinates = [String]()
@@ -28,6 +35,76 @@ class ViewController: UIViewController, UITextFieldDelegate {
                                                name: UIAccessibility.elementFocusedNotification,
                                                object: nil)
         setupHideKeyboardOnTap()
+        
+        // Define a custom rotor for navigating between custom elements
+        let customRotor = UIAccessibilityCustomRotor(name: "Custom Navigation") { predicate in
+            return self.handleRotorSearch(predicate: predicate)
+        }
+        
+        // Assign the custom rotor to the view
+        view.accessibilityCustomRotors = [customRotor]
+        
+        // Start monitoring device motion for tap detection
+        startDeviceMotionUpdates()
+    }
+    
+    private func handleRotorSearch(predicate: UIAccessibilityCustomRotorSearchPredicate) -> UIAccessibilityCustomRotorItemResult? {
+            guard let currentElement = predicate.currentItem.targetElement as? UIView else {
+                print("Current element is not a UIView.")
+                return nil
+            }
+            let direction = predicate.searchDirection
+            
+            // Find the next or previous element based on the direction
+            guard let nextElement = findNextElement(from: currentElement, direction: direction) else {
+                print("Next element not found.")
+                return nil
+            }
+            
+            print("Navigating to next element: \(String(describing: nextElement.accessibilityLabel))")
+            return UIAccessibilityCustomRotorItemResult(targetElement: nextElement, targetRange: nil)
+        }
+        
+        private func findNextElement(from currentElement: UIView, direction: UIAccessibilityCustomRotor.Direction) -> UIView? {
+            let elements: [UIView] = [label1, label2, label3] //  actual UI elements
+            guard let currentIndex = elements.firstIndex(of: currentElement) else {
+                print("Current element not found in elements array.")
+                return nil
+            }
+            
+            let nextIndex: Int
+            if direction == .next {
+                nextIndex = (currentIndex + 1) % elements.count
+            } else {
+                nextIndex = (currentIndex - 1 + elements.count) % elements.count
+            }
+            
+            return elements[nextIndex]
+        }
+
+    
+    private func startDeviceMotionUpdates() {
+        guard motionManager.isDeviceMotionAvailable else { return }
+        print("motion working!!!")
+        
+        motionManager.deviceMotionUpdateInterval = 0.1
+        motionManager.startDeviceMotionUpdates(to: OperationQueue.main) { [weak self] (motion, error) in
+            guard let self = self, let motion = motion else { return }
+            self.detectTap(motion: motion)
+        }
+    }
+    
+    private func detectTap(motion: CMDeviceMotion) {
+        // Simple tap detection logic based on acceleration
+        let acceleration = motion.userAcceleration
+        let threshold: Double = 0.2 // Set a suitable threshold
+    
+        
+        if abs(acceleration.x) > threshold || abs(acceleration.y) > threshold || abs(acceleration.z) > threshold {
+            // Detected a tap-like motion, trigger the rotor
+            print("Tap detected with acceleration: \(acceleration)")
+            UIAccessibility.post(notification: .pageScrolled, argument: nil)
+        }
     }
     
     func setupHideKeyboardOnTap() {
