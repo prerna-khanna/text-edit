@@ -107,7 +107,7 @@ class ViewController: UIViewController, UITextFieldDelegate {
             // Detected a tap-like motion, trigger the rotor
             print("Words")
             print("Tap detected with acceleration: \(acceleration)")
-            nextWord() // Move to the next word
+            nextWord() // Move to the next word - call this based on the selection
             UIAccessibility.post(notification: .pageScrolled, argument: nil)
         }
         
@@ -115,21 +115,17 @@ class ViewController: UIViewController, UITextFieldDelegate {
             // Detected a tap-like motion, trigger the rotor
             print("Characters")
             print("Tap detected with acceleration: \(acceleration)")
-            nextCharacter()
+            nextCharacter() // Move to the next Character - call this based on the selection
             UIAccessibility.post(notification: .pageScrolled, argument: nil)
         }
         
-//        else{
-//            print("Lines")
-//            print("Tap detected with acceleration: \(acceleration)")
-//            nextLine()
-//            UIAccessibility.post(notification: .pageScrolled, argument: nil)
-//        }
     }
     
+    // By - Monalika Padma Reddy (Aug 05, 2024)
+    // nextWord() - Identifies the current Word, then moves the cursor to the following Word, and announces the Word through VoiceOver, cursor is there on the Word that it announces.
+         
     private func nextWord() {
-        
-        print("Inside Next Word")
+        print("Inside Next Word (with delay)")
         
         guard let textRange = userInputTextField.selectedTextRange else { return }
         
@@ -141,25 +137,40 @@ class ViewController: UIViewController, UITextFieldDelegate {
             // Find the next word range
             if let positionAfterCurrentWord = userInputTextField.position(from: currentWordRange.end, offset: 1),
                let nextWordRange = userInputTextField.tokenizer.rangeEnclosingPosition(positionAfterCurrentWord, with: .word, inDirection: UITextDirection.storage(.forward)) {
-                let nextWord = userInputTextField.text(in: nextWordRange) ?? ""
-                print("Next word: \(nextWord)")
-                
                 // Move the cursor to the next word
                 userInputTextField.selectedTextRange = nextWordRange
+                
+                // Allow some time for the text range to update before announcing
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                    // Get the text in the new selected range and make VoiceOver read it
+                    if let selectedText = self.userInputTextField.text(in: nextWordRange) {
+                        print("Next word: \(selectedText)")
+                        UIAccessibility.post(notification: .announcement, argument: selectedText)
+                    } else {
+                        print("No next word found.")
+                        UIAccessibility.post(notification: .announcement, argument: "No next word found.")
+                    }
+                }
             } else {
                 print("No next word found.")
+                UIAccessibility.post(notification: .announcement, argument: "No next word found.")
             }
         } else {
             print("No current word found.")
+            UIAccessibility.post(notification: .announcement, argument: "No current word found.")
         }
     }
     
+    
+     
+    // By - Monalika Padma Reddy (Aug 05, 2024)
+    //  nextCharacter() - Identifies the current Character, then moves the cursor to the following Character, and announces the Character through VoiceOver, cursor is there on the Character that it announces.
+         
     private func nextCharacter() {
-        
-        print("Inside Next Character")
+        print("Inside Next Character (with delay)")
 
         guard let textRange = userInputTextField.selectedTextRange else { return }
-        
+
         // Get the current character
         if let currentPosition = userInputTextField.position(from: textRange.start, offset: 0),
            let nextPosition = userInputTextField.position(from: currentPosition, offset: 1),
@@ -176,39 +187,27 @@ class ViewController: UIViewController, UITextFieldDelegate {
                 
                 // Move the cursor to the next character
                 userInputTextField.selectedTextRange = nextCharRange
+                
+                // Allow some time for the text range to update before announcing
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                    // Get the text in the new selected range and make VoiceOver read it
+                    if let selectedText = self.userInputTextField.text(in: nextCharRange) {
+                        print("Selected character: \(selectedText)")
+                        UIAccessibility.post(notification: .announcement, argument: selectedText)
+                    } else {
+                        print("No next character found.")
+                        UIAccessibility.post(notification: .announcement, argument: "No next character found.")
+                    }
+                }
             } else {
                 print("No next character found.")
+                UIAccessibility.post(notification: .announcement, argument: "No next character found.")
             }
         } else {
             print("No current character found.")
+            UIAccessibility.post(notification: .announcement, argument: "No current character found.")
         }
     }
-    
-//    private func nextLine() {
-//        print("Inside Next Line")
-//        
-//        guard let textRange = userInputTextField.selectedTextRange else { return }
-//        
-//        // Get the current line
-//        if let currentLineRange = userInputTextField.tokenizer.rangeEnclosingPosition(textRange.start, with: .line, inDirection: UITextDirection.storage(.forward)) {
-//            let currentLine = userInputTextField.text(in: currentLineRange) ?? ""
-//            print("Current line: \(currentLine)")
-//            
-//            // Find the next line range
-//            if let positionAfterCurrentLine = userInputTextField.position(from: currentLineRange.end, offset: 1),
-//               let nextLineRange = userInputTextField.tokenizer.rangeEnclosingPosition(positionAfterCurrentLine, with: .line, inDirection: UITextDirection.storage(.forward)) {
-//                let nextLine = userInputTextField.text(in: nextLineRange) ?? ""
-//                print("Next line: \(nextLine)")
-//                
-//                // Move the cursor to the next line
-//                userInputTextField.selectedTextRange = nextLineRange
-//            } else {
-//                print("No next line found.")
-//            }
-//        } else {
-//            print("No current line found.")
-//        }
-//    }
 
     func setupHideKeyboardOnTap() {
         let tapGesture = UITapGestureRecognizer(target: self, action: #selector(hideKeyboard))
