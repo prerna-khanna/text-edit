@@ -1,4 +1,6 @@
-// control going into handleRotorSearch function - obtaining directions but the Control not going to the UI Elements label1, label2, lable3
+// Control going into handleRotorSearch function - Done
+// Direction info relayed to handleRotorSerach function - Done
+// Current focus changing in terminal, but not in the app and for some reason it does not go into the text box at all - In Progress
 
 import UIKit
 import CoreMotion
