@@ -70,105 +70,120 @@ class ViewController: UIViewController, UITextFieldDelegate {
     }
     
     private func handleRotorSearchWord(predicate: UIAccessibilityCustomRotorSearchPredicate) -> UIAccessibilityCustomRotorItemResult? {
-            print("---------------------Inside handleRotorSearchWord function -------------------------------")
-//            direction = predicate.searchDirection
-//
-//            var nextElement: UITextRange?
-//
-//            if direction == .next {
-//                print("Next")
-//                nextElement = nextWord()
-//            } else if direction == .previous {
-//                print("Previous")
-//                nextElement = previousWord()
-//            }
-//
-//            if let nextElement = nextElement {
-//                return UIAccessibilityCustomRotorItemResult(targetElement: userInputTextField, targetRange: nextElement)
-//            } else {
-                return nil // No more elements found in the direction
-            //}
+            print("Inside handleRotorSearchWord function")
+        
+           view.gestureRecognizers?.forEach(view.removeGestureRecognizer)
+        
+            view.isUserInteractionEnabled = true
+        
+            self.updateActiveRotor(name: "Custom Word")
+
+           
+           // Create swipe gesture recognizers
+           let swipeUp = UISwipeGestureRecognizer(target: self, action: #selector(handleSwipe(_:)))
+           print("Before SwipeUp")
+           swipeUp.direction = .up
+           
+           let swipeDown = UISwipeGestureRecognizer(target: self, action: #selector(handleSwipe(_:)))
+            print("before SwipeDown")
+           swipeDown.direction = .down
+           
+           // Add gesture recognizers to the view
+           view.addGestureRecognizer(swipeUp)
+           view.addGestureRecognizer(swipeDown)
+        
+            print("Added swipe gestures: \(swipeUp) and \(swipeDown)")
+            self.updateActiveRotor(name: "Custom Word")
+
+            return nil
         }
 
         private func handleRotorSearchChar(predicate: UIAccessibilityCustomRotorSearchPredicate) -> UIAccessibilityCustomRotorItemResult? {
-            print("------------------Inside handleRotorSearchChar function -------------------------------")
-//            direction = predicate.searchDirection
-//
-//            var nextElement: UITextRange?
-//
-//            if direction == .next {
-//                print("Next")
-//                nextElement = nextCharacter()
-//            } else if direction == .previous {
-//                print("Previous")
-//                nextElement = previousCharacter()
-//            }
-//            if let nextElement = nextElement {
-//                return UIAccessibilityCustomRotorItemResult(targetElement: userInputTextField, targetRange: nextElement)
-//            } else {
-                return nil // No more elements found in the direction
-//            }
+            print("Inside handleRotorSearchChar function")
+            
+            // Remove existing swipe gestures if needed
+            view.gestureRecognizers?.forEach(view.removeGestureRecognizer)
+            
+            view.isUserInteractionEnabled = true
+            
+            // Create swipe gesture recognizers
+            print("Before SwipeUp")
+            let swipeUp = UISwipeGestureRecognizer(target: self, action: #selector(handleSwipe(_:)))
+            swipeUp.direction = .up
+            
+            print("Before SwipeDown")
+            let swipeDown = UISwipeGestureRecognizer(target: self, action: #selector(handleSwipe(_:)))
+            swipeDown.direction = .down
+            
+            // Add gesture recognizers to the view
+            view.addGestureRecognizer(swipeUp)
+            view.addGestureRecognizer(swipeDown)
+            print("Added swipe gestures: \(swipeUp) and \(swipeDown)")
+
+            
+            self.updateActiveRotor(name: "Custom Character")
+            
+            return nil
         }
+    
+    
+    @objc func handleSwipe(_ gesture: UISwipeGestureRecognizer) {
+        print("Inside SwipeGestureRecignizer")
+        guard let activeRotorName = activeRotorName else { return }
+        
+        if let userInput = userInputTextField.text, !userInput.isEmpty  {
+            switch gesture.direction {
+                case .up:
+                    if activeRotorName == "Custom Line" {
+                        previousLine()
+                    } else if activeRotorName == "Custom Character" {
+                        previousCharacter()
+                    } else {
+                        previousWord()
+                    }
+                case .down:
+                    if activeRotorName == "Custom Line" {
+                        nextLine()
+                    } else if activeRotorName == "Custom Character" {
+                        nextCharacter()
+                    } else {
+                        nextWord()
+                    }
+                default:
+                    break
+            }
+        } else {
+            
+            UIAccessibility.post(notification: .announcement, argument: "No text found.")
+        }
+    }
+    
         
         private func handleRotorSearchLine(predicate: UIAccessibilityCustomRotorSearchPredicate) -> UIAccessibilityCustomRotorItemResult? {
-            print("------------------Inside handleRotorSearchLine function -------------------------------")
-//            direction = predicate.searchDirection
-//
-//            var nextElement: UITextRange?
-//
-//            if direction == .next {
-//                print("Next")
-//                nextElement = nextLine()
-//            } else if direction == .previous {
-//                print("Previous")
-//                nextElement = previousLine()
-//            }
-//            if let nextElement = nextElement {
-//                return UIAccessibilityCustomRotorItemResult(targetElement: userInputTextField, targetRange: nextElement)
-//            } else {
-            return nil // No more elements found in the direction
-//            }
-        }
-    private func handleRotorSearch(predicate: UIAccessibilityCustomRotorSearchPredicate, labels: [UILabel]) -> UIAccessibilityCustomRotorItemResult? {
-        guard let currentElement = predicate.currentItem.targetElement as? UILabel else {
-            print("Current element is not a UILabel.")
+            print("Inside handleRotorSearchLine function")
+            
+            view.gestureRecognizers?.forEach(view.removeGestureRecognizer)
+            
+            view.isUserInteractionEnabled = true
+            
+            // Create swipe gesture recognizers
+            print("Before SwipeUp")
+            let swipeUp = UISwipeGestureRecognizer(target: self, action: #selector(handleSwipe(_:)))
+            swipeUp.direction = .up
+            
+            print("Before SwipeDown")
+            let swipeDown = UISwipeGestureRecognizer(target: self, action: #selector(handleSwipe(_:)))
+            swipeDown.direction = .down
+            
+            // Add gesture recognizers to the view
+            view.addGestureRecognizer(swipeUp)
+            view.addGestureRecognizer(swipeDown)
+            print("Added swipe gestures: \(swipeUp) and \(swipeDown)")
+            
+            self.updateActiveRotor(name: "Custom Line")
             return nil
         }
-        
-        let direction = predicate.searchDirection
-        var nextElement: UILabel?
-        
-        if direction == .next {
-            nextElement = findNextElement(from: currentElement, in: labels, forward: true)
-        } else {
-            nextElement = findNextElement(from: currentElement, in: labels, forward: false)
-        }
-        
-        guard let element = nextElement else {
-            print("Next element not found.")
-            return nil
-        }
-        
-        print("Navigating to element: \(String(describing: element.accessibilityLabel))")
-        return UIAccessibilityCustomRotorItemResult(targetElement: element, targetRange: nil)
-    }
-    
-    private func findNextElement(from currentElement: UILabel, in labels: [UILabel], forward: Bool) -> UILabel? {
-        guard let currentIndex = labels.firstIndex(of: currentElement) else {
-            print("Current element not found in labels array.")
-            return nil
-        }
-        
-        let nextIndex: Int
-        if forward {
-            nextIndex = (currentIndex + 1) % labels.count
-        } else {
-            nextIndex = (currentIndex - 1 + labels.count) % labels.count
-        }
-        
-        return labels[nextIndex]
-    }
-    
+
     private func startDeviceMotionUpdates() {
         guard motionManager.isDeviceMotionAvailable else {
             print("Device motion is not available.")
@@ -187,211 +202,276 @@ class ViewController: UIViewController, UITextFieldDelegate {
     }
     
     private func detectTap(motion: CMDeviceMotion) {
-        // Simple tap detection logic based on acceleration
-        print("Inside detect tap")
+
         let acceleration = motion.userAcceleration
         let threshold: Double = 0.2 // Set a suitable threshold
         let threshold1: Double = 0.3
         let threshold2: Double = 0.8
-
-        print("Acceleration detected: x=\(acceleration.x), y=\(acceleration.y), z=\(acceleration.z)")
         
-        if let activeRotor = activeRotor {
-            print("Active Rotor: \(activeRotor.name)")
-        }
-
         if (abs(acceleration.x) > threshold && abs(acceleration.x) <= threshold1) ||
             (abs(acceleration.y) > threshold && abs(acceleration.y) <= threshold1) ||
             (abs(acceleration.z) > threshold && abs(acceleration.z) <= threshold1) {
-            
+            print("-------------Detect Tap-------------")
             print("Detected tap within thresholds, moving to previous rotor")
             moveToPreviousRotor()
         } else if (abs(acceleration.x) > threshold1 && abs(acceleration.x) <= threshold2) ||
                     (abs(acceleration.y) > threshold1 && abs(acceleration.y) <= threshold2) ||
                     (abs(acceleration.z) > threshold1 && abs(acceleration.z) <= threshold2) {
+            print("-------------Detect Tap-------------")
             print("Detected tap outside thresholds, moving to next rotor")
             moveToNextRotor()
         }
     }
     
-    private func nextWord() -> UITextRange? {
-            print("Inside Next Word")
+    private func nextLine() {
+        
+        userInputTextField.selectedTextRange = userInputTextField.textRange(from: userInputTextField.beginningOfDocument, to: userInputTextField.endOfDocument)
+        
+        guard let textRange = userInputTextField.selectedTextRange else { return }
 
-            guard let textRange = userInputTextField.selectedTextRange else { return nil }
+        // Schedule VoiceOver announcement asynchronously
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+            // Get the text in the new selected range and make VoiceOver read it
+            if let selectedText = self.userInputTextField.text(in: textRange) {
 
-            // Get the current word range
-            if let currentWordRange = userInputTextField.tokenizer.rangeEnclosingPosition(textRange.start, with: .word, inDirection: UITextDirection.storage(.forward)) {
-                let currentWord = userInputTextField.text(in: currentWordRange) ?? ""
-                print("Current word: \(currentWord)")
-
-                // Find the next word range
-                if let positionAfterCurrentWord = userInputTextField.position(from: currentWordRange.end, offset: 1),
-                   let nextWordRange = userInputTextField.tokenizer.rangeEnclosingPosition(positionAfterCurrentWord, with: .word, inDirection: UITextDirection.storage(.forward)) {
-
-                    // Move the cursor to the next word
-                    userInputTextField.selectedTextRange = nextWordRange
-
-                    // Schedule VoiceOver announcement asynchronously
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-                        // Get the text in the new selected range and make VoiceOver read it
-                        if let selectedText = self.userInputTextField.text(in: nextWordRange) {
-                            print("Next word: \(selectedText)")
-                            UIAccessibility.post(notification: .announcement, argument: selectedText)
-                        } else {
-                            print("No next word found.")
-                            UIAccessibility.post(notification: .announcement, argument: "No next word found.")
-                        }
-                    }
-
-                    return nextWordRange
-                } else {
-                    print("No next word found.")
-                    UIAccessibility.post(notification: .announcement, argument: "No next word found.")
-                }
+                UIAccessibility.post(notification: .announcement, argument: selectedText)
+            } else {
+                print("No next word found.")
+                UIAccessibility.post(notification: .announcement, argument: "No next word found.")
             }
-            return nil
         }
+    }
     
-    private func previousWord() -> UITextRange? {
-            print("Inside Previous Word")
+    private func previousLine() {
+        let newPosition = userInputTextField.endOfDocument
+        userInputTextField.selectedTextRange = userInputTextField.textRange(from: newPosition, to: userInputTextField.beginningOfDocument)
 
-            guard let textRange = userInputTextField.selectedTextRange else { return nil }
+        
+        guard let textRange = userInputTextField.selectedTextRange else { return }
 
-            // Get the current word range
-            if let currentWordRange = userInputTextField.tokenizer.rangeEnclosingPosition(textRange.start, with: .word, inDirection: UITextDirection.storage(.backward)) {
-                let currentWord = userInputTextField.text(in: currentWordRange) ?? ""
-                print("Current word: \(currentWord)")
 
-                // Find the previous word range
-                if let positionBeforeCurrentWord = userInputTextField.position(from: currentWordRange.start, offset: -1),
-                   let previousWordRange = userInputTextField.tokenizer.rangeEnclosingPosition(positionBeforeCurrentWord, with: .word, inDirection: UITextDirection.storage(.backward)) {
-                    // Move the cursor to the previous word
-                    userInputTextField.selectedTextRange = previousWordRange
+        // Schedule VoiceOver announcement asynchronously
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+            // Get the text in the new selected range and make VoiceOver read it
+            if let selectedText = self.userInputTextField.text(in: textRange) {
 
-                    // Allow some time for the text range to update before announcing
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-                        // Get the text in the new selected range and make VoiceOver read it
-                        if let selectedText = self.userInputTextField.text(in: previousWordRange) {
-                            print("Previous word: \(selectedText)")
-                            UIAccessibility.post(notification: .announcement, argument: selectedText)
-                        } else {
-                            print("No previous word found.")
-                            UIAccessibility.post(notification: .announcement, argument: "No previous word found.")
-                        }
-                    }
-                    return previousWordRange
-                } else {
-                    print("No previous word found.")
-                    UIAccessibility.post(notification: .announcement, argument: "No previous word found.")
+                if let userString = self.userInputTextField.text {
+                    let reversedStringArray = userString.components(separatedBy: CharacterSet(charactersIn: " ")).reversed()
+                    let finalString = reversedStringArray.joined(separator: " ")
+
+                    UIAccessibility.post(notification: .announcement, argument: String(finalString))
                 }
+            } else {
+                print("No next word found.")
+                UIAccessibility.post(notification: .announcement, argument: "No next word found.")
             }
-            return nil
         }
-
-        private func nextCharacter() -> UITextRange?  {
-            print("Inside Next Character")
-
-            guard let textRange = userInputTextField.selectedTextRange else { return nil }
-
-            // Get the current character
-            if let currentPosition = userInputTextField.position(from: textRange.start, offset: 0),
-               let nextPosition = userInputTextField.position(from: currentPosition, offset: 1),
-               let currentCharRange = userInputTextField.textRange(from: currentPosition, to: nextPosition) {
-                let currentCharacter = userInputTextField.text(in: currentCharRange) ?? ""
-                print("Current character: \(currentCharacter)")
-
-                // Find the next character range
-                if let positionAfterCurrentChar = userInputTextField.position(from: currentPosition, offset: 1),
-                   let nextCharPosition = userInputTextField.position(from: positionAfterCurrentChar, offset: 1),
-                   let nextCharRange = userInputTextField.textRange(from: positionAfterCurrentChar, to: nextCharPosition) {
-                    let nextCharacter = userInputTextField.text(in: nextCharRange) ?? ""
-                    print("Next character: \(nextCharacter)")
-
-                    // Move the cursor to the next character
-                    userInputTextField.selectedTextRange = nextCharRange
-
-                    // Allow some time for the text range to update before announcing
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-                        // Get the text in the new selected range and make VoiceOver read it
-                        if let selectedText = self.userInputTextField.text(in: nextCharRange) {
-                            print("Selected character: \(selectedText)")
-                            UIAccessibility.post(notification: .announcement, argument: selectedText)
-                        } else {
-                            print("No next character found.")
-                            UIAccessibility.post(notification: .announcement, argument: "No next character found.")
-                        }
+    }
+    
+    private func nextWord(){
+        print("Inside Next Word")
+        
+        guard let textRange = userInputTextField.selectedTextRange else { return }
+        
+        // Get the current word range
+        if let currentWordRange = userInputTextField.tokenizer.rangeEnclosingPosition(textRange.start, with: .word, inDirection: UITextDirection.storage(.forward)) {
+            let currentWord = userInputTextField.text(in: currentWordRange) ?? ""
+            print("Current word: \(currentWord)")
+            
+            // Find the next word range
+            if let positionAfterCurrentWord = userInputTextField.position(from: currentWordRange.end, offset: 1),
+               let nextWordRange = userInputTextField.tokenizer.rangeEnclosingPosition(positionAfterCurrentWord, with: .word, inDirection: UITextDirection.storage(.forward)) {
+                
+                // Move the cursor to the next word
+                userInputTextField.selectedTextRange = nextWordRange
+                
+                // Schedule VoiceOver announcement asynchronously
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                    // Get the text in the new selected range and make VoiceOver read it
+                    if let selectedText = self.userInputTextField.text(in: nextWordRange) {
+                        print("Next word: \(selectedText)")
+                        UIAccessibility.post(notification: .announcement, argument: selectedText)
+                    } else {
+                        print("No next word found.")
+                        UIAccessibility.post(notification: .announcement, argument: "No next word found.")
                     }
-                    return nextCharRange
-                } else {
-                    print("No next character found.")
-                    UIAccessibility.post(notification: .announcement, argument: "No next character found.")
                 }
+            } else {
+                print("No next word found.")
+                UIAccessibility.post(notification: .announcement, argument: "No next word found.")
             }
-            return nil
         }
+    }
+    
+    private func previousWord() {
+        print("Inside Previous Word")
+        guard let textRange = userInputTextField.selectedTextRange else { return }
 
-        private func previousCharacter() -> UITextRange? {
-            print("Inside Previous Character")
-
-            guard let textRange = userInputTextField.selectedTextRange else { return nil }
-
-            // Get the current character
-            if let currentPosition = userInputTextField.position(from: textRange.start, offset: 0),
-               let previousPosition = userInputTextField.position(from: currentPosition, offset: -1),
-               let currentCharRange = userInputTextField.textRange(from: previousPosition, to: currentPosition) {
-                let currentCharacter = userInputTextField.text(in: currentCharRange) ?? ""
-                print("Current character: \(currentCharacter)")
-
-                // Find the previous character range
-                if let positionBeforeCurrentChar = userInputTextField.position(from: currentPosition, offset: -1),
-                   let previousCharRange = userInputTextField.textRange(from: positionBeforeCurrentChar, to: currentPosition) {
-                    let previousCharacter = userInputTextField.text(in: previousCharRange) ?? ""
-                    print("Previous character: \(previousCharacter)")
-
-                    // Move the cursor to the previous character
-                    userInputTextField.selectedTextRange = previousCharRange
-
-                    // Allow some time for the text range to update before announcing
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-                        // Get the text in the new selected range and make VoiceOver read it
-                        if let selectedText = self.userInputTextField.text(in: previousCharRange) {
-                            print("Selected character: \(selectedText)")
-                            UIAccessibility.post(notification: .announcement, argument: selectedText)
-                        } else {
-                            print("No previous character found.")
-                            UIAccessibility.post(notification: .announcement, argument: "No previous character found.")
-                        }
+        // Get the current word range
+        if let currentWordRange = userInputTextField.tokenizer.rangeEnclosingPosition(textRange.end, with: .word, inDirection: UITextDirection.storage(.backward)) {
+            let currentWord = userInputTextField.text(in: currentWordRange) ?? ""
+            print("Current word: \(currentWord)")
+            
+            // Find the previous word range
+            if let positionBeforeCurrentWord = userInputTextField.position(from: currentWordRange.start, offset: -1),
+               let previousWordRange = userInputTextField.tokenizer.rangeEnclosingPosition(positionBeforeCurrentWord, with: .word, inDirection: UITextDirection.storage(.backward)) {
+                // Move the cursor to the previous word
+                userInputTextField.selectedTextRange = previousWordRange
+                
+                // Allow some time for the text range to update before announcing
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                    // Get the text in the new selected range and make VoiceOver read it
+                    if let selectedText = self.userInputTextField.text(in: previousWordRange) {
+                        print("Previous word: \(selectedText)")
+                        UIAccessibility.post(notification: .announcement, argument: selectedText)
+                    } else {
+                        print("No previous word found.")
+                        UIAccessibility.post(notification: .announcement, argument: "No previous word found.")
                     }
-                    return previousCharRange
-                } else {
-                    print("No previous character found.")
-                    UIAccessibility.post(notification: .announcement, argument: "No previous character found.")
                 }
+            } else {
+                print("No previous word found.")
+                UIAccessibility.post(notification: .announcement, argument: "No previous word found.")
             }
-            return nil
         }
-
-
+    }
+    
+    private func nextCharacter() {
+        print("Inside Next Character")
+        
+        guard let textRange = userInputTextField.selectedTextRange else { return  }
+        
+        // Get the current character
+        if let currentPosition = userInputTextField.position(from: textRange.start, offset: 0),
+           let nextPosition = userInputTextField.position(from: currentPosition, offset: 1),
+           let currentCharRange = userInputTextField.textRange(from: currentPosition, to: nextPosition) {
+            let currentCharacter = userInputTextField.text(in: currentCharRange) ?? ""
+            print("Current character: \(currentCharacter)")
+            
+            // Find the next character range
+            if let positionAfterCurrentChar = userInputTextField.position(from: currentPosition, offset: 1),
+               let nextCharPosition = userInputTextField.position(from: positionAfterCurrentChar, offset: 1),
+               let nextCharRange = userInputTextField.textRange(from: positionAfterCurrentChar, to: nextCharPosition) {
+                let nextCharacter = userInputTextField.text(in: nextCharRange) ?? ""
+                print("Next character: \(nextCharacter)")
+                
+                // Move the cursor to the next character
+                userInputTextField.selectedTextRange = nextCharRange
+                
+                // Allow some time for the text range to update before announcing
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                    // Get the text in the new selected range and make VoiceOver read it
+                    if let selectedText = self.userInputTextField.text(in: nextCharRange) {
+                        print("Selected character: \(selectedText)")
+                        UIAccessibility.post(notification: .announcement, argument: selectedText)
+                    } else {
+                        print("No next character found.")
+                        UIAccessibility.post(notification: .announcement, argument: "No next character found.")
+                    }
+                }
+                
+            } else {
+                print("No next character found.")
+                UIAccessibility.post(notification: .announcement, argument: "No next character found.")
+            }
+        }
+        
+    }
+    
+    private func previousCharacter() {
+        print("Inside Previous Character")
+        
+        guard let textRange = userInputTextField.selectedTextRange else { return }
+        
+        // Get the current character
+        if let currentPosition = userInputTextField.position(from: textRange.start, offset: 0),
+           let previousPosition = userInputTextField.position(from: currentPosition, offset: -1),
+           let currentCharRange = userInputTextField.textRange(from: previousPosition, to: currentPosition) {
+            let currentCharacter = userInputTextField.text(in: currentCharRange) ?? ""
+            print("Current character: \(currentCharacter)")
+            
+            // Find the previous character range
+            if let positionBeforeCurrentChar = userInputTextField.position(from: currentPosition, offset: -1),
+               let previousCharRange = userInputTextField.textRange(from: positionBeforeCurrentChar, to: currentPosition) {
+                let previousCharacter = userInputTextField.text(in: previousCharRange) ?? ""
+                print("Previous character: \(previousCharacter)")
+                
+                // Move the cursor to the previous character
+                userInputTextField.selectedTextRange = previousCharRange
+                
+                // Allow some time for the text range to update before announcing
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                    // Get the text in the new selected range and make VoiceOver read it
+                    if let selectedText = self.userInputTextField.text(in: previousCharRange) {
+                        print("Selected character: \(selectedText)")
+                        UIAccessibility.post(notification: .announcement, argument: selectedText)
+                    } else {
+                        print("No previous character found.")
+                        UIAccessibility.post(notification: .announcement, argument: "No previous character found.")
+                    }
+                }
+            } else {
+                print("No previous character found.")
+                UIAccessibility.post(notification: .announcement, argument: "No previous character found.")
+            }
+        }
+    }
+    
+    //Move to the Next Rotor
     func moveToNextRotor() {
+        print("Inside moveToNextRotor")
+        print("Previous Active rotor: \(activeRotor!.name)")
         if let currentIndex = customRotors.firstIndex(of: activeRotor!) {
             let nextIndex = currentIndex + 1
             if nextIndex < customRotors.count {
                 activeRotor = customRotors[nextIndex]
-                print("Active Rotor: \(activeRotor!.name)")
-                UIAccessibility.post(notification: .announcement, argument: "Active Rotor: \(activeRotor!.name)")
+                print("Current Active Rotor: \(activeRotor!.name)")
+                if (activeRotor!.name) == "Custom Word" {
+                    handleWordsFunction()
+                } else if (activeRotor!.name) == "Custom Character" {
+                    handleCharactersFunction()
+                } else if (activeRotor!.name) == "Custom Line" {
+                    handleLineFunction()
+                }
 
+                UIAccessibility.post(notification: .announcement, argument: "Active Rotor: \(activeRotor!.name)")
             } else {
                 print("No more rotors in the forward direction.")
             }
         }
     }
+    func handleWordsFunction() {
+        print("Handling Custom Word Rotor")
+        _ = handleRotorSearchWord(predicate: UIAccessibilityCustomRotorSearchPredicate())
+    }
+
+    func handleCharactersFunction() {
+        print("Handling Custom Character Rotor")
+        _ = handleRotorSearchChar(predicate: UIAccessibilityCustomRotorSearchPredicate())
+    }
+
+    func handleLineFunction() {
+        // Your logic for handling lines
+        print("Handling Custom Line Rotor")
+        _ = handleRotorSearchLine(predicate: UIAccessibilityCustomRotorSearchPredicate())
+
+    }
     
+    // Move to the Previous rotor
     func moveToPreviousRotor() {
+        print("Inside moveToPreviousRotor")
         if let currentIndex = customRotors.firstIndex(of: activeRotor!) {
             let previousIndex = currentIndex - 1
             if previousIndex >= 0 {
                 activeRotor = customRotors[previousIndex]
                 print("Active Rotor: \(activeRotor!.name)")
+                if (activeRotor!.name) == "Custom Word" {
+                    handleWordsFunction()
+                } else if (activeRotor!.name) == "Custom Character" {
+                    handleCharactersFunction()
+                } else if (activeRotor!.name) == "Custom Line" {
+                    handleLineFunction()
+                }
                 UIAccessibility.post(notification: .announcement, argument: "Active Rotor: \(activeRotor!.name)")
             } else {
                 print("No more rotors in the backward direction.")
