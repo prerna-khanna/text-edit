@@ -13,17 +13,53 @@
 		65E7AED72BFE6FA300B31DBF /* Base in Resources */ = {isa = PBXBuildFile; fileRef = 65E7AED62BFE6FA300B31DBF /* Base */; };
 		65E7AED92BFE6FA400B31DBF /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 65E7AED82BFE6FA400B31DBF /* Assets.xcassets */; };
 		65E7AEDC2BFE6FA400B31DBF /* Base in Resources */ = {isa = PBXBuildFile; fileRef = 65E7AEDB2BFE6FA400B31DBF /* Base */; };
+		65FA14922C6C3204004C85E8 /* gestureApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65FA14912C6C3204004C85E8 /* gestureApp.swift */; };
+		65FA14942C6C3204004C85E8 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65FA14932C6C3204004C85E8 /* ContentView.swift */; };
+		65FA14962C6C3205004C85E8 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 65FA14952C6C3205004C85E8 /* Assets.xcassets */; };
+		65FA14992C6C3205004C85E8 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 65FA14982C6C3205004C85E8 /* Preview Assets.xcassets */; };
+		65FA149C2C6C3205004C85E8 /* gesture Watch App.app in Embed Watch Content */ = {isa = PBXBuildFile; fileRef = 65FA148F2C6C3204004C85E8 /* gesture Watch App.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 /* End PBXBuildFile section */
 
+/* Begin PBXContainerItemProxy section */
+		65FA149A2C6C3205004C85E8 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 65E7AEC42BFE6FA300B31DBF /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 65FA148E2C6C3204004C85E8;
+			remoteInfo = "gesture Watch App";
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		65FA14472C6C26A7004C85E8 /* Embed Watch Content */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "$(CONTENTS_FOLDER_PATH)/Watch";
+			dstSubfolderSpec = 16;
+			files = (
+				65FA149C2C6C3205004C85E8 /* gesture Watch App.app in Embed Watch Content */,
+			);
+			name = "Embed Watch Content";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
 /* Begin PBXFileReference section */
+		652EEB952C699551001F99A4 /* WatchConnectivity.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WatchConnectivity.framework; path = System/Library/Frameworks/WatchConnectivity.framework; sourceTree = SDKROOT; };
+		652EEB972C69958C001F99A4 /* WatchConnectivity.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WatchConnectivity.framework; path = Platforms/WatchOS.platform/Developer/SDKs/WatchOS10.5.sdk/System/Library/Frameworks/WatchConnectivity.framework; sourceTree = DEVELOPER_DIR; };
 		65E7AECC2BFE6FA300B31DBF /* text edit.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "text edit.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		65E7AECF2BFE6FA300B31DBF /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		65E7AED12BFE6FA300B31DBF /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
-		65E7AED32BFE6FA300B31DBF /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
+		65E7AED32BFE6FA300B31DBF /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.xcfilelist; };
 		65E7AED62BFE6FA300B31DBF /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		65E7AED82BFE6FA400B31DBF /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		65E7AEDB2BFE6FA400B31DBF /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		65E7AEDD2BFE6FA400B31DBF /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		65FA148F2C6C3204004C85E8 /* gesture Watch App.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "gesture Watch App.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		65FA14912C6C3204004C85E8 /* gestureApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = gestureApp.swift; sourceTree = "<group>"; };
+		65FA14932C6C3204004C85E8 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		65FA14952C6C3205004C85E8 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		65FA14982C6C3205004C85E8 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -34,14 +70,32 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		65FA148C2C6C3204004C85E8 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		652EEB942C699551001F99A4 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				652EEB972C69958C001F99A4 /* WatchConnectivity.framework */,
+				652EEB952C699551001F99A4 /* WatchConnectivity.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 		65E7AEC32BFE6FA300B31DBF = {
 			isa = PBXGroup;
 			children = (
 				65E7AECE2BFE6FA300B31DBF /* text edit */,
+				65FA14902C6C3204004C85E8 /* gesture Watch App */,
 				65E7AECD2BFE6FA300B31DBF /* Products */,
+				652EEB942C699551001F99A4 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -49,6 +103,7 @@
 			isa = PBXGroup;
 			children = (
 				65E7AECC2BFE6FA300B31DBF /* text edit.app */,
+				65FA148F2C6C3204004C85E8 /* gesture Watch App.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -67,6 +122,25 @@
 			path = "text edit";
 			sourceTree = "<group>";
 		};
+		65FA14902C6C3204004C85E8 /* gesture Watch App */ = {
+			isa = PBXGroup;
+			children = (
+				65FA14912C6C3204004C85E8 /* gestureApp.swift */,
+				65FA14932C6C3204004C85E8 /* ContentView.swift */,
+				65FA14952C6C3205004C85E8 /* Assets.xcassets */,
+				65FA14972C6C3205004C85E8 /* Preview Content */,
+			);
+			path = "gesture Watch App";
+			sourceTree = "<group>";
+		};
+		65FA14972C6C3205004C85E8 /* Preview Content */ = {
+			isa = PBXGroup;
+			children = (
+				65FA14982C6C3205004C85E8 /* Preview Assets.xcassets */,
+			);
+			path = "Preview Content";
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -77,14 +151,33 @@
 				65E7AEC82BFE6FA300B31DBF /* Sources */,
 				65E7AEC92BFE6FA300B31DBF /* Frameworks */,
 				65E7AECA2BFE6FA300B31DBF /* Resources */,
+				65FA14472C6C26A7004C85E8 /* Embed Watch Content */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				65FA149B2C6C3205004C85E8 /* PBXTargetDependency */,
+			);
+			name = "text edit";
+			productName = "text edit";
+			productReference = 65E7AECC2BFE6FA300B31DBF /* text edit.app */;
+			productType = "com.apple.product-type.application";
+		};
+		65FA148E2C6C3204004C85E8 /* gesture Watch App */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 65FA149F2C6C3205004C85E8 /* Build configuration list for PBXNativeTarget "gesture Watch App" */;
+			buildPhases = (
+				65FA148B2C6C3204004C85E8 /* Sources */,
+				65FA148C2C6C3204004C85E8 /* Frameworks */,
+				65FA148D2C6C3204004C85E8 /* Resources */,
 			);
 			buildRules = (
 			);
 			dependencies = (
 			);
-			name = "text edit";
-			productName = "text edit";
-			productReference = 65E7AECC2BFE6FA300B31DBF /* text edit.app */;
+			name = "gesture Watch App";
+			productName = "gesture Watch App";
+			productReference = 65FA148F2C6C3204004C85E8 /* gesture Watch App.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -100,6 +193,9 @@
 					65E7AECB2BFE6FA300B31DBF = {
 						CreatedOnToolsVersion = 15.4;
 					};
+					65FA148E2C6C3204004C85E8 = {
+						CreatedOnToolsVersion = 15.4;
+					};
 				};
 			};
 			buildConfigurationList = 65E7AEC72BFE6FA300B31DBF /* Build configuration list for PBXProject "text edit" */;
@@ -111,11 +207,15 @@
 				Base,
 			);
 			mainGroup = 65E7AEC32BFE6FA300B31DBF;
+			packageReferences = (
+				65398A772C6B9383002B93C5 /* XCRemoteSwiftPackageReference "Pulse" */,
+			);
 			productRefGroup = 65E7AECD2BFE6FA300B31DBF /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
 				65E7AECB2BFE6FA300B31DBF /* text edit */,
+				65FA148E2C6C3204004C85E8 /* gesture Watch App */,
 			);
 		};
 /* End PBXProject section */
@@ -128,6 +228,15 @@
 				65E7AED92BFE6FA400B31DBF /* Assets.xcassets in Resources */,
 				65E7AEDC2BFE6FA400B31DBF /* Base in Resources */,
 				65E7AED72BFE6FA300B31DBF /* Base in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		65FA148D2C6C3204004C85E8 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				65FA14992C6C3205004C85E8 /* Preview Assets.xcassets in Resources */,
+				65FA14962C6C3205004C85E8 /* Assets.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -144,7 +253,24 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		65FA148B2C6C3204004C85E8 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				65FA14942C6C3204004C85E8 /* ContentView.swift in Sources */,
+				65FA14922C6C3204004C85E8 /* gestureApp.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		65FA149B2C6C3205004C85E8 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 65FA148E2C6C3204004C85E8 /* gesture Watch App */;
+			targetProxy = 65FA149A2C6C3205004C85E8 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
 
 /* Begin PBXVariantGroup section */
 		65E7AED52BFE6FA300B31DBF /* Main.storyboard */ = {
@@ -288,13 +414,45 @@
 		65E7AEE12BFE6FA400B31DBF /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = QAM8XYX33F;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "";
+				INFOPLIST_KEY_LSSupportsOpeningDocumentsInPlace = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
+				INFOPLIST_KEY_UIMainStoryboardFile = Main;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "touch.text-editing";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		65E7AEE22BFE6FA400B31DBF /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = M4DNVMNSZG;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = "text edit/Info.plist";
+				INFOPLIST_FILE = "";
+				INFOPLIST_KEY_LSSupportsOpeningDocumentsInPlace = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				INFOPLIST_KEY_UIMainStoryboardFile = Main;
@@ -311,33 +469,69 @@
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
-			name = Debug;
+			name = Release;
 		};
-		65E7AEE22BFE6FA400B31DBF /* Release */ = {
+		65FA149D2C6C3205004C85E8 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = M4DNVMNSZG;
+				DEVELOPMENT_ASSET_PATHS = "\"gesture Watch App/Preview Content\"";
+				DEVELOPMENT_TEAM = QAM8XYX33F;
+				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = "text edit/Info.plist";
-				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
-				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
-				INFOPLIST_KEY_UIMainStoryboardFile = Main;
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_FILE = "";
+				INFOPLIST_KEY_CFBundleDisplayName = gesture;
+				INFOPLIST_KEY_MetalCaptureEnabled = NO;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
+				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = "touch.text-editing";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = "touch.text-edit";
+				PRODUCT_BUNDLE_IDENTIFIER = "touch.text-editing.watchkitapp";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = watchos;
+				SKIP_INSTALL = YES;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = 4;
+				WATCHOS_DEPLOYMENT_TARGET = 10.5;
+			};
+			name = Debug;
+		};
+		65FA149E2C6C3205004C85E8 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_ASSET_PATHS = "\"gesture Watch App/Preview Content\"";
+				DEVELOPMENT_TEAM = M4DNVMNSZG;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "";
+				INFOPLIST_KEY_CFBundleDisplayName = gesture;
+				INFOPLIST_KEY_MetalCaptureEnabled = NO;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
+				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = "touch.text-editing";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "touch.text-edit.watchkitapp";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = watchos;
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 4;
+				WATCHOS_DEPLOYMENT_TARGET = 10.5;
 			};
 			name = Release;
 		};
@@ -362,7 +556,27 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
+		65FA149F2C6C3205004C85E8 /* Build configuration list for PBXNativeTarget "gesture Watch App" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				65FA149D2C6C3205004C85E8 /* Debug */,
+				65FA149E2C6C3205004C85E8 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		65398A772C6B9383002B93C5 /* XCRemoteSwiftPackageReference "Pulse" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/kean/Pulse";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 4.2.7;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
 	};
 	rootObject = 65E7AEC42BFE6FA300B31DBF /* Project object */;
 }

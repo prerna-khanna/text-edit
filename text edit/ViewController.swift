@@ -1,17 +1,13 @@
-//
-//  ViewController.swift
-//  text edit
-//
-//  Created by Prerna Khanna on 5/22/24.
-//
-
 import UIKit
-import CoreMotion
+import WatchConnectivity
+import Foundation
 
-class ViewController: UIViewController, UITextFieldDelegate {
+extension Notification.Name {
+    static let didReceiveRotationData = Notification.Name("didReceiveRotationData")
+}
+
+class ViewController: UIViewController, UITextFieldDelegate, WCSessionDelegate {
     
-    private let motionManager = CMMotionManager()
-
     @IBOutlet weak var userIdTextField: UITextField!
     @IBOutlet weak var recordSwitch: UISwitch!
     @IBOutlet weak var messageLabel: UILabel!
@@ -25,88 +21,126 @@ class ViewController: UIViewController, UITextFieldDelegate {
 
     var isRecording = false
     var touchCoordinates = [String]()
-    var selectedOption = 1 // Default to option 1
+    var selectedOption = 1
+    private var wcSession: WCSession?
 
     override func viewDidLoad() {
         super.viewDidLoad()
         setupUI()
+        setupRotationDataObserver()
+        setupWatchConnectivity()
         NotificationCenter.default.addObserver(self,
                                                selector: #selector(handleVoiceOverFocusChanged(notification:)),
                                                name: UIAccessibility.elementFocusedNotification,
                                                object: nil)
         setupHideKeyboardOnTap()
         
-        // Define a custom rotor for navigating between custom elements
         let customRotor = UIAccessibilityCustomRotor(name: "Custom Navigation") { predicate in
             return self.handleRotorSearch(predicate: predicate)
         }
         
-        // Assign the custom rotor to the view
         view.accessibilityCustomRotors = [customRotor]
-        
-        // Start monitoring device motion for tap detection
-        startDeviceMotionUpdates()
     }
-    
-    private func handleRotorSearch(predicate: UIAccessibilityCustomRotorSearchPredicate) -> UIAccessibilityCustomRotorItemResult? {
-            guard let currentElement = predicate.currentItem.targetElement as? UIView else {
-                print("Current element is not a UIView.")
-                return nil
-            }
-            let direction = predicate.searchDirection
-            
-            // Find the next or previous element based on the direction
-            guard let nextElement = findNextElement(from: currentElement, direction: direction) else {
-                print("Next element not found.")
-                return nil
-            }
-            
-            print("Navigating to next element: \(String(describing: nextElement.accessibilityLabel))")
-            return UIAccessibilityCustomRotorItemResult(targetElement: nextElement, targetRange: nil)
-        }
-        
-        private func findNextElement(from currentElement: UIView, direction: UIAccessibilityCustomRotor.Direction) -> UIView? {
-            let elements: [UIView] = [label1, label2, label3] //  actual UI elements
-            guard let currentIndex = elements.firstIndex(of: currentElement) else {
-                print("Current element not found in elements array.")
-                return nil
-            }
-            
-            let nextIndex: Int
-            if direction == .next {
-                nextIndex = (currentIndex + 1) % elements.count
-            } else {
-                nextIndex = (currentIndex - 1 + elements.count) % elements.count
-            }
-            
-            return elements[nextIndex]
-        }
 
-    
-    private func startDeviceMotionUpdates() {
-        guard motionManager.isDeviceMotionAvailable else { return }
-        print("motion working!!!")
-        
-        motionManager.deviceMotionUpdateInterval = 0.1
-        motionManager.startDeviceMotionUpdates(to: OperationQueue.main) { [weak self] (motion, error) in
-            guard let self = self, let motion = motion else { return }
-            self.detectTap(motion: motion)
+    private func setupWatchConnectivity() {
+        if WCSession.isSupported() {
+            wcSession = WCSession.default
+            wcSession?.delegate = self
+            if let session = wcSession, session.activationState != .activated {
+                session.activate()
+            }
         }
     }
-    
-    private func detectTap(motion: CMDeviceMotion) {
-        // Simple tap detection logic based on acceleration
-        let acceleration = motion.userAcceleration
-        let threshold: Double = 0.2 // Set a suitable threshold
-    
-        
-        if abs(acceleration.x) > threshold || abs(acceleration.y) > threshold || abs(acceleration.z) > threshold {
-            // Detected a tap-like motion, trigger the rotor
-            print("Tap detected with acceleration: \(acceleration)")
+
+    func session(_ session: WCSession, activationDidCompleteWith activationState: WCSessionActivationState, error: Error?) {
+        if let error = error {
+            print("WCSession activation failed with error: \(error.localizedDescription)")
+        } else {
+            print("WCSession activated with state: \(activationState.rawValue)")
+        }
+    }
+
+    func sessionDidBecomeInactive(_ session: WCSession) {
+        print("WCSession became inactive.")
+    }
+
+    func sessionDidDeactivate(_ session: WCSession) {
+        print("WCSession deactivated.")
+        session.activate()
+    }
+
+    // Implement this method to handle incoming messages from the Watch
+    func session(_ session: WCSession, didReceiveMessage message: [String : Any]) {
+        // Extract the rotation data from the message
+        if let rotationRateX = message["rotationRateX"] as? Double,
+           let rotationRateY = message["rotationRateY"] as? Double,
+           let rotationRateZ = message["rotationRateZ"] as? Double {
+            print("Received rotation rates - X: \(rotationRateX), Y: \(rotationRateY), Z: \(rotationRateZ)")
+            
+            // Optionally, post a notification to notify other parts of your app about the received data
+            NotificationCenter.default.post(name: .didReceiveRotationData, object: nil, userInfo: message)
+        } else {
+            print("Received message with unknown data.")
+        }
+    }
+
+    private func setupRotationDataObserver() {
+        NotificationCenter.default.addObserver(self,
+                                               selector: #selector(handleRotationData(notification:)),
+                                               name: .didReceiveRotationData,
+                                               object: nil)
+    }
+
+    @objc private func handleRotationData(notification: Notification) {
+        guard let rotationData = notification.userInfo as? [String: Double] else { return }
+        detectTap(rotationData: rotationData)
+    }
+
+    private func detectTap(rotationData: [String: Double]) {
+        let threshold: Double = 0.2
+
+        if abs(rotationData["rotationRateX"] ?? 0) > threshold ||
+           abs(rotationData["rotationRateY"] ?? 0) > threshold ||
+           abs(rotationData["rotationRateZ"] ?? 0) > threshold {
+            
+            print("Tap detected with rotation data: \(rotationData)")
             UIAccessibility.post(notification: .pageScrolled, argument: nil)
         }
     }
     
+    private func handleRotorSearch(predicate: UIAccessibilityCustomRotorSearchPredicate) -> UIAccessibilityCustomRotorItemResult? {
+        guard let currentElement = predicate.currentItem.targetElement as? UIView else {
+            print("Current element is not a UIView.")
+            return nil
+        }
+        let direction = predicate.searchDirection
+        
+        guard let nextElement = findNextElement(from: currentElement, direction: direction) else {
+            print("Next element not found.")
+            return nil
+        }
+        
+        print("Navigating to next element: \(String(describing: nextElement.accessibilityLabel))")
+        return UIAccessibilityCustomRotorItemResult(targetElement: nextElement, targetRange: nil)
+    }
+    
+    private func findNextElement(from currentElement: UIView, direction: UIAccessibilityCustomRotor.Direction) -> UIView? {
+        let elements: [UIView] = [label1, label2, label3]
+        guard let currentIndex = elements.firstIndex(of: currentElement) else {
+            print("Current element not found in elements array.")
+            return nil
+        }
+        
+        let nextIndex: Int
+        if direction == .next {
+            nextIndex = (currentIndex + 1) % elements.count
+        } else {
+            nextIndex = (currentIndex - 1 + elements.count) % elements.count
+        }
+        
+        return elements[nextIndex]
+    }
+
     func setupHideKeyboardOnTap() {
         let tapGesture = UITapGestureRecognizer(target: self, action: #selector(hideKeyboard))
         tapGesture.cancelsTouchesInView = false
@@ -127,18 +161,18 @@ class ViewController: UIViewController, UITextFieldDelegate {
     func setupSlider() {
         optionSlider.minimumValue = 1
         optionSlider.maximumValue = 5
-        optionSlider.value = 1 // Start with the first option selected
-        optionSlider.isContinuous = true // Update value continuously as the user slides
-        updateSliderValueLabel() // Initial update for the label
+        optionSlider.value = 1
+        optionSlider.isContinuous = true
+        updateSliderValueLabel()
     }
 
     @IBAction func sliderValueChanged(_ sender: UISlider) {
         let roundedValue = round(sender.value)
-        sender.value = roundedValue // Snap to integer values
+        sender.value = roundedValue
         selectedOption = Int(roundedValue)
         updateOptionDisplay()
-        updateSliderValueLabel() // Update the label whenever the slider value changes
-        userInputTextField.text = "" // Clear the text field when option changes
+        updateSliderValueLabel()
+        userInputTextField.text = ""
     }
 
     func updateSliderValueLabel() {
@@ -147,10 +181,10 @@ class ViewController: UIViewController, UITextFieldDelegate {
 
     func updateOptionDisplay() {
         let options = ["See what concerts we have for you in your city.",
-           "The injury is more serious than the Panthers first expected.",
-           "History repeated itself last season when Barcelona beat Madrid.",
-           "The law enforcement has a responsibility for the safety of the public.",
-           "He pleaded guilty in February under an agreement with the government."
+                       "The injury is more serious than the Panthers first expected.",
+                       "History repeated itself last season when Barcelona beat Madrid.",
+                       "The law enforcement has a responsibility for the safety of the public.",
+                       "He pleaded guilty in February under an agreement with the government."
         ]
         messageLabel.text = options[selectedOption - 1]
     }
