@@ -1,6 +1,6 @@
 import SwiftUI
-import CoreMotion
 import WatchConnectivity
+import CoreMotion
 
 @main
 struct gesture_Watch_AppApp: App {
@@ -16,11 +16,11 @@ struct WatchContentView: View {
     
     var body: some View {
         VStack {
-            Text("Device Motion Data")
+            Text("Motion Data")
                 .font(.headline)
-            Text("Rotation X: \(motionManager.rotationRateX, specifier: "%.2f")")
-            Text("Rotation Y: \(motionManager.rotationRateY, specifier: "%.2f")")
-            Text("Rotation Z: \(motionManager.rotationRateZ, specifier: "%.2f")")
+            Text("X: \(motionManager.accelerationX, specifier: "%.2f")")
+            Text("Y: \(motionManager.accelerationY, specifier: "%.2f")")
+            Text("Z: \(motionManager.accelerationZ, specifier: "%.2f")")
         }
         .onAppear {
             motionManager.startUpdates()
@@ -35,9 +35,9 @@ class MotionManager: NSObject, ObservableObject, WCSessionDelegate {
     private var motionManager: CMMotionManager
     private var wcSession: WCSession?
     
-    @Published var rotationRateX: Double = 0.0
-    @Published var rotationRateY: Double = 0.0
-    @Published var rotationRateZ: Double = 0.0
+    @Published var accelerationX: Double = 0.0
+    @Published var accelerationY: Double = 0.0
+    @Published var accelerationZ: Double = 0.0
 
     override init() {
         self.motionManager = CMMotionManager()
@@ -46,35 +46,35 @@ class MotionManager: NSObject, ObservableObject, WCSessionDelegate {
     }
     
     func startUpdates() {
-        if motionManager.isDeviceMotionAvailable {
-            print("Device Motion is available.")
-            motionManager.deviceMotionUpdateInterval = 0.1
-            motionManager.startDeviceMotionUpdates(to: OperationQueue.main) { [weak self] (motionData, error) in
-                guard let self = self, let motionData = motionData else {
+        if motionManager.isAccelerometerAvailable {
+            motionManager.accelerometerUpdateInterval = 0.1
+            motionManager.startAccelerometerUpdates(to: OperationQueue.main) { [weak self] (accelData, error) in
+                guard let self = self, let accelData = accelData else {
                     if let error = error {
-                        print("Device Motion update error: \(error.localizedDescription)")
+                        print("Accelerometer update error: \(error.localizedDescription)")
                     }
                     return
                 }
                 
-                self.rotationRateX = motionData.rotationRate.x
-                self.rotationRateY = motionData.rotationRate.y
-                self.rotationRateZ = motionData.rotationRate.z
+                self.accelerationX = accelData.acceleration.x
+                self.accelerationY = accelData.acceleration.y
+                self.accelerationZ = accelData.acceleration.z
                 
-                // Debug statements to see the values
-                print("Rotation Rate X: \(self.rotationRateX)")
-                print("Rotation Rate Y: \(self.rotationRateY)")
-                print("Rotation Rate Z: \(self.rotationRateZ)")
+                let accelerationInfo: [String: Double] = [
+                    "accelerationX": accelData.acceleration.x,
+                    "accelerationY": accelData.acceleration.y,
+                    "accelerationZ": accelData.acceleration.z
+                ]
                 
-                self.sendRotationDataToPhone()
+                self.sendAccelerationData(accelerationInfo)
             }
         } else {
-            print("Device Motion is not available.")
+            print("Accelerometer is not available.")
         }
     }
     
     func stopUpdates() {
-        motionManager.stopDeviceMotionUpdates()
+        motionManager.stopAccelerometerUpdates()
     }
     
     private func setupWatchConnectivity() {
@@ -85,19 +85,12 @@ class MotionManager: NSObject, ObservableObject, WCSessionDelegate {
         }
     }
     
-    private func sendRotationDataToPhone() {
+    private func sendAccelerationData(_ accelerationInfo: [String: Double]) {
         guard let session = wcSession, session.isReachable else {
-            print("WCSession is not reachable.")
+            print("Session is not reachable")
             return
         }
-        
-        let data = [
-            "rotationRateX": rotationRateX,
-            "rotationRateY": rotationRateY,
-            "rotationRateZ": rotationRateZ
-        ]
-        
-        session.sendMessage(data, replyHandler: nil) { error in
+        session.sendMessage(accelerationInfo, replyHandler: nil) { error in
             print("Failed to send data: \(error.localizedDescription)")
         }
     }
@@ -114,9 +107,9 @@ class MotionManager: NSObject, ObservableObject, WCSessionDelegate {
 
     func sessionReachabilityDidChange(_ session: WCSession) {
         if session.isReachable {
-            print("WCSession is reachable")
+            print("Session is reachable")
         } else {
-            print("WCSession is not reachable")
+            print("Session is not reachable")
         }
     }
 }

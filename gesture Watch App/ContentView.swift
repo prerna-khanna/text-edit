@@ -2,7 +2,7 @@
 //  ContentView.swift
 //  gesture Watch App
 //
-//  Created by Prerna Khanna on 8/11/24.
+//  Created by Prerna Khanna on 8/13/24.
 //
 
 import SwiftUI
