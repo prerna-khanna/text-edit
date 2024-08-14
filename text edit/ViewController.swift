@@ -75,7 +75,7 @@ class ViewController: UIViewController, UITextFieldDelegate, WCSessionDelegate {
         if let rotationRateX = message["rotationRateX"] as? Double,
            let rotationRateY = message["rotationRateY"] as? Double,
            let rotationRateZ = message["rotationRateZ"] as? Double {
-            print("Received rotation rates - X: \(rotationRateX), Y: \(rotationRateY), Z: \(rotationRateZ)")
+            //print("Received rotation rates - X: \(rotationRateX), Y: \(rotationRateY), Z: \(rotationRateZ)")
             
             // Optionally, post a notification to notify other parts of your app about the received data
             NotificationCenter.default.post(name: .didReceiveRotationData, object: nil, userInfo: message)
