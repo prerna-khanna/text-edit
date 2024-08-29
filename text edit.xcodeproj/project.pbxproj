@@ -18,6 +18,8 @@
 		65FA14962C6C3205004C85E8 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 65FA14952C6C3205004C85E8 /* Assets.xcassets */; };
 		65FA14992C6C3205004C85E8 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 65FA14982C6C3205004C85E8 /* Preview Assets.xcassets */; };
 		65FA149C2C6C3205004C85E8 /* gesture Watch App.app in Embed Watch Content */ = {isa = PBXBuildFile; fileRef = 65FA148F2C6C3204004C85E8 /* gesture Watch App.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		65FA14A12C6EA34E004C85E8 /* SensorKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 65FA14A02C6EA34E004C85E8 /* SensorKit.framework */; };
+		65FA14A32C7688C8004C85E8 /* GestureRecognition.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65FA14A22C7688C8004C85E8 /* GestureRecognition.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -60,6 +62,8 @@
 		65FA14932C6C3204004C85E8 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		65FA14952C6C3205004C85E8 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		65FA14982C6C3205004C85E8 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
+		65FA14A02C6EA34E004C85E8 /* SensorKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SensorKit.framework; path = System/Library/Frameworks/SensorKit.framework; sourceTree = SDKROOT; };
+		65FA14A22C7688C8004C85E8 /* GestureRecognition.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GestureRecognition.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -67,6 +71,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				65FA14A12C6EA34E004C85E8 /* SensorKit.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -83,6 +88,7 @@
 		652EEB942C699551001F99A4 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				65FA14A02C6EA34E004C85E8 /* SensorKit.framework */,
 				652EEB972C69958C001F99A4 /* WatchConnectivity.framework */,
 				652EEB952C699551001F99A4 /* WatchConnectivity.framework */,
 			);
@@ -111,6 +117,7 @@
 		65E7AECE2BFE6FA300B31DBF /* text edit */ = {
 			isa = PBXGroup;
 			children = (
+				65FA14A22C7688C8004C85E8 /* GestureRecognition.swift */,
 				65E7AECF2BFE6FA300B31DBF /* AppDelegate.swift */,
 				65E7AED12BFE6FA300B31DBF /* SceneDelegate.swift */,
 				65E7AED32BFE6FA300B31DBF /* ViewController.swift */,
@@ -250,6 +257,7 @@
 				65E7AED42BFE6FA300B31DBF /* ViewController.swift in Sources */,
 				65E7AED02BFE6FA300B31DBF /* AppDelegate.swift in Sources */,
 				65E7AED22BFE6FA300B31DBF /* SceneDelegate.swift in Sources */,
+				65FA14A32C7688C8004C85E8 /* GestureRecognition.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -419,7 +427,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = QAM8XYX33F;
+				DEVELOPMENT_TEAM = M4DNVMNSZG;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "";
 				INFOPLIST_KEY_LSSupportsOpeningDocumentsInPlace = YES;
@@ -433,7 +441,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = "touch.text-editing";
+				PRODUCT_BUNDLE_IDENTIFIER = "touch.text-edit";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
@@ -479,20 +487,20 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"gesture Watch App/Preview Content\"";
-				DEVELOPMENT_TEAM = QAM8XYX33F;
+				DEVELOPMENT_TEAM = M4DNVMNSZG;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "";
 				INFOPLIST_KEY_CFBundleDisplayName = gesture;
 				INFOPLIST_KEY_MetalCaptureEnabled = NO;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
-				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = "touch.text-editing";
+				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = "touch.text-edit";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = "touch.text-editing.watchkitapp";
+				PRODUCT_BUNDLE_IDENTIFIER = "touch.text-edit.watchkitapp";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = watchos;
 				SKIP_INSTALL = YES;
@@ -518,7 +526,7 @@
 				INFOPLIST_KEY_CFBundleDisplayName = gesture;
 				INFOPLIST_KEY_MetalCaptureEnabled = NO;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
-				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = "touch.text-editing";
+				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = "touch.text-edit";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
