@@ -3,7 +3,7 @@ import Foundation
 class GestureRecognition {
     private var gyroBuffer: [Double] = []
     private let bufferSize: Int
-    private let gestureTemplate: [Double] = [
+    private let gestureTemplates: [[Double]]  = [[
         0.0273662902857841, 0.0096136642698253, 0.0299626335350401, 0.0203267142120236, 0.0150850646285773,
         0.0175197216339734, 0.0282312321457451, 0.0131611542109491, 0.0224213975679534, 0.0758647581049567,
         0.1077884075769018, 0.2463211093302544, 0.3428345052769407, 0.5637560983900718, 0.7229892117916004,
@@ -13,7 +13,8 @@ class GestureRecognition {
         1.561783960541736, 1.8114679936859084, 1.4989656682232668, 1.4643025229798616, 0.9552191609985268,
         0.5371748724867738, 0.266639588805185, 0.1650568307665377, 0.0647875709235766, 0.0447365225884726,
         0.1052103098580713, 0.0193779350393047, 0.017722997111184, 0.0670756464035376, 0.0646950657198886
-    ]
+    ]]
+    private let recognitionThreshold: Double = 10.0 // Adjusted threshold for tighter matching
 
     private var recordingTemplate: [Double] = []
     private var isRecording = false
@@ -61,14 +62,16 @@ class GestureRecognition {
         return false
     }
     
-    // Check if the current buffer matches the gesture template using DTW
+    // Check if the current buffer matches any gesture template using DTW
     private func checkForGesture() -> Bool {
         guard gyroBuffer.count == bufferSize else {
             return false
         }
         
-        if dtwDistance(buffer: gyroBuffer, template: gestureTemplate) < 15.0 { // Example threshold
-            return true
+        for template in gestureTemplates {
+            if dtwDistance(buffer: gyroBuffer, template: template) < recognitionThreshold {
+                return true
+            }
         }
         
         return false
@@ -90,9 +93,24 @@ class GestureRecognition {
                                        dtw[i - 1][j - 1])    // Match
             }
         }
-        
         print(dtw[m][n])
         
         return dtw[m][n]
+    }
+    
+    // Optional: Apply a noise reduction filter to the gyro data
+    private func applyNoiseReduction(to data: [Double]) -> [Double] {
+        // Example: Simple moving average filter
+        let windowSize = 3
+        guard data.count >= windowSize else { return data }
+        
+        var smoothedData = [Double]()
+        for i in 0..<(data.count - windowSize + 1) {
+            let window = data[i..<(i + windowSize)]
+            let average = window.reduce(0, +) / Double(windowSize)
+            smoothedData.append(average)
+        }
+        
+        return smoothedData
     }
 }

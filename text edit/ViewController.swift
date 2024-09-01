@@ -15,22 +15,18 @@ class ViewController: UIViewController, UITextFieldDelegate, WCSessionDelegate, 
     @IBOutlet weak var userInputTextField: UITextField!
     @IBOutlet weak var optionSlider: UISlider!
     @IBOutlet weak var sliderValueLabel: UILabel!
-    @IBOutlet weak var modeSwitch: UISwitch! // Switch to toggle between recording and recognition
-    @IBOutlet weak var recordButton: UIButton! // Button to start/stop recording
-
-    @IBOutlet weak var label1: UILabel!
-    @IBOutlet weak var label2: UILabel!
-    @IBOutlet weak var label3: UILabel!
+    @IBOutlet weak var modeSwitch: UISwitch!
+    @IBOutlet weak var recordButton: UIButton!
 
     var isRecording = false
-    var isRecognitionMode = true // Start in recognition mode
-    var selectedOption: Int = 1  // Default selected option
+    var isRecognitionMode = true
+    var selectedOption: Int = 1
     private var wcSession: WCSession?
     private var lastGestureRecognized = false
-    private var touchCoordinates: [String] = [] // Stores touch coordinates
+    private var touchCoordinates: [String] = []
 
-    // Gesture recognition instance
     private var gestureRecognition = GestureRecognition(bufferSize: 20)
+    private var currentRotorIndex = 0 // Track the current rotor index
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -46,16 +42,93 @@ class ViewController: UIViewController, UITextFieldDelegate, WCSessionDelegate, 
 
         setupHideKeyboardOnTap()
 
-        let customRotor = UIAccessibilityCustomRotor(name: "Custom Navigation") { predicate in
-            return self.handleRotorSearch(predicate: predicate)
-        }
-
-        view.accessibilityCustomRotors = [customRotor]
+        // Setup custom rotors
+        setupCustomRotors()
 
         modeSwitch.addTarget(self, action: #selector(modeSwitchToggled), for: .valueChanged)
         recordButton.addTarget(self, action: #selector(recordButtonTapped), for: .touchUpInside)
         recordSwitch.addTarget(self, action: #selector(toggleRecording(_:)), for: .valueChanged)
     }
+
+    // Remove labels and custom navigation, implementing custom rotors instead
+    private func setupCustomRotors() {
+        let customWordRotor = UIAccessibilityCustomRotor(name: "Custom Words") { predicate in
+            return self.moveCursor(in: self.userInputTextField, for: predicate, granularity: .word)
+            
+        }
+
+        let customCharRotor = UIAccessibilityCustomRotor(name: "Custom Characters") { predicate in
+            return self.moveCursor(in: self.userInputTextField, for: predicate, granularity: .character)
+        }
+
+        let customLineRotor = UIAccessibilityCustomRotor(name: "Custom Lines") { predicate in
+            return self.moveCursor(in: self.userInputTextField, for: predicate, granularity: .line)
+        }
+        userInputTextField.accessibilityCustomRotors = [customWordRotor, customCharRotor, customLineRotor]
+        print("custom rotor added")
+    }
+
+private func moveCursor(in textField: UITextField, for predicate: UIAccessibilityCustomRotorSearchPredicate, granularity: UITextGranularity) -> UIAccessibilityCustomRotorItemResult? {
+    guard let textRange = textField.selectedTextRange else {
+        print("No selected text range.")
+        return nil
+    }
+    
+    var currentPosition = predicate.searchDirection == .next ? textRange.end : textRange.start
+    let offset = predicate.searchDirection == .next ? 1 : -1
+    
+    print("Current position: \(currentPosition), Direction: \(predicate.searchDirection == .next ? "Forward" : "Backward")")
+    
+    if granularity == .character {
+        // Simple movement for characters by offset
+        if let newPosition = textField.position(from: currentPosition, offset: offset) {
+            if let charRange = textField.textRange(from: newPosition, to: newPosition) {
+                print("Moving to character at position: \(newPosition)")
+                textField.selectedTextRange = charRange
+                return UIAccessibilityCustomRotorItemResult(targetElement: textField, targetRange: nil)
+            }
+        }
+        
+        print("Failed to move to the next or previous character.")
+        return nil
+    }
+    
+    // Handle word granularity
+    while true {
+        if let newRange = textField.tokenizer.rangeEnclosingPosition(currentPosition, with: .word, inDirection: predicate.searchDirection == .next ? .storage(.forward) : .storage(.backward)) {
+            if (predicate.searchDirection == .next && newRange.start == currentPosition) ||
+               (predicate.searchDirection == .previous && newRange.end == currentPosition) {
+                print("Stuck at the same position, trying to adjust.")
+                if let adjustedPosition = textField.position(from: currentPosition, offset: offset) {
+                    currentPosition = adjustedPosition
+                    continue
+                } else {
+                    print("Failed to adjust position.")
+                    break
+                }
+            }
+            
+            print("Moving to word range: Start = \(newRange.start), End = \(newRange.end)")
+            textField.selectedTextRange = newRange
+            return UIAccessibilityCustomRotorItemResult(targetElement: textField, targetRange: nil)
+        } else {
+            print("Failed to find range, adjusting position incrementally.")
+            if let adjustedPosition = textField.position(from: currentPosition, offset: offset) {
+                currentPosition = adjustedPosition
+                continue
+            } else {
+                print("No more positions available, breaking.")
+                break
+            }
+        }
+    }
+    
+    print("Failed to move to the next or previous word.")
+    return nil
+}
+
+
+
 
     @objc private func handleVoiceOverFocusChanged(notification: Notification) {
         guard let userInfo = notification.userInfo,
@@ -233,7 +306,7 @@ class ViewController: UIViewController, UITextFieldDelegate, WCSessionDelegate, 
                 
                 if gestureRecognized {
                     if !lastGestureRecognized {
-                        performRotorAction()
+                        moveToNextRotor()
                     }
                     lastGestureRecognized = true
                 } else {
@@ -250,68 +323,17 @@ class ViewController: UIViewController, UITextFieldDelegate, WCSessionDelegate, 
         }
     }
 
-    private func performRotorAction() {
-        DispatchQueue.main.async {
-            // Attempt to start with the first label if the current element is not in the array
-            var currentElement = UIAccessibility.focusedElement(using: .notificationVoiceOver) as? UIView
-            
-            if currentElement == nil || !(self.findNextElement(from: currentElement!, direction: .next) != nil) {
-                currentElement = self.label1
-            }
-            
-            guard let nextItem = self.findNextElement(from: currentElement!, direction: .next) else {
-                print("No element found to move the rotor.")
-                return
-            }
-            
-            UIAccessibility.post(notification: .screenChanged, argument: nextItem)
-            print("Moved to the next custom rotor item.")
+    private func moveToNextRotor() {
+        guard let rotors = userInputTextField.accessibilityCustomRotors, !rotors.isEmpty else {
+            print("No custom rotors available.")
+            return
         }
-    }
 
-private func handleRotorSearch(predicate: UIAccessibilityCustomRotorSearchPredicate) -> UIAccessibilityCustomRotorItemResult? {
-    guard let currentElement = predicate.currentItem.targetElement as? UIView else {
-        print("Current element is not a UIView.")
-        return nil
-    }
-    let direction = predicate.searchDirection
-    
-    guard let nextElement = findNextElement(from: currentElement, direction: direction) else {
-        print("Next element not found.")
-        return nil
-    }
-    
-    // Access the accessibilityLabel directly
-    print("Navigating to next element: \(String(describing: nextElement.accessibilityLabel))")
-    return UIAccessibilityCustomRotorItemResult(targetElement: nextElement, targetRange: nil)
-}
-
-
-    private func findNextElement(from currentElement: UIView, direction: UIAccessibilityCustomRotor.Direction) -> UIView? {
-        let elements: [UIView] = [label1, label2, label3]
-
-        // Log details of each element in the array
-        for (index, element) in elements.enumerated() {
-            print("Element \(index): \(element), Accessibility Label: \(String(describing: element.accessibilityLabel))")
-        }
+        currentRotorIndex = (currentRotorIndex + 1) % rotors.count
+        let nextRotor = rotors[currentRotorIndex]
         
-        // Log the details of the current element
-        print("Current Element: \(currentElement), Accessibility Label: \(String(describing: currentElement.accessibilityLabel))")
-        
-        // Try to find the current element in the array
-        guard let currentIndex = elements.firstIndex(of: currentElement) else {
-            print("Current element not found in elements array.")
-            return nil
-        }
-
-        let nextIndex: Int
-        if direction == .next {
-            nextIndex = (currentIndex + 1) % elements.count
-        } else {
-            nextIndex = (currentIndex - 1 + elements.count) % elements.count
-        }
-
-        return elements[nextIndex]
+        UIAccessibility.post(notification: .announcement, argument: nextRotor.name)
+        // The rotor will change based on the announcement, we assume here
     }
 
     func setupHideKeyboardOnTap() {

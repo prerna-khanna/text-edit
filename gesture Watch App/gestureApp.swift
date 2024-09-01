@@ -1,6 +1,7 @@
 import SwiftUI
 import CoreMotion
 import WatchConnectivity
+import WatchKit
 
 @main
 struct gesture_Watch_AppApp: App {
@@ -16,11 +17,16 @@ struct WatchContentView: View {
     
     var body: some View {
         VStack {
-            Text("Device Motion Data")
-                .font(.headline)
-            Text("Rotation X: \(motionManager.rotationRateX, specifier: "%.2f")")
-            Text("Rotation Y: \(motionManager.rotationRateY, specifier: "%.2f")")
-            Text("Rotation Z: \(motionManager.rotationRateZ, specifier: "%.2f")")
+            if motionManager.isSendingData {
+                Text("Sending Data...")
+                    .font(.headline)
+                Text("Rotation X: \(motionManager.rotationRateX, specifier: "%.2f")")
+                Text("Rotation Y: \(motionManager.rotationRateY, specifier: "%.2f")")
+                Text("Rotation Z: \(motionManager.rotationRateZ, specifier: "%.2f")")
+            } else {
+                Text("Tap to Start")
+                    .font(.headline)
+            }
         }
         .onAppear {
             motionManager.startUpdates()
@@ -28,21 +34,29 @@ struct WatchContentView: View {
         .onDisappear {
             motionManager.stopUpdates()
         }
+        .contentShape(Rectangle()) // Makes the entire view tappable
+        .onTapGesture {
+            motionManager.startSendingDataForDuration(20) // Trigger data send for 20 seconds on tap
+        }
     }
 }
 
 class MotionManager: NSObject, ObservableObject, WCSessionDelegate {
     private var motionManager: CMMotionManager
     private var wcSession: WCSession?
+    private var timer: Timer?
+    private var extendedRuntimeSession: WKExtendedRuntimeSession?
     
     @Published var rotationRateX: Double = 0.0
     @Published var rotationRateY: Double = 0.0
     @Published var rotationRateZ: Double = 0.0
+    @Published var isSendingData: Bool = false
 
     override init() {
         self.motionManager = CMMotionManager()
         super.init()
         setupWatchConnectivity()
+        setupExtendedRuntimeSession()
     }
     
     func startUpdates() {
@@ -66,7 +80,10 @@ class MotionManager: NSObject, ObservableObject, WCSessionDelegate {
                 print("Rotation Rate Y: \(self.rotationRateY)")
                 print("Rotation Rate Z: \(self.rotationRateZ)")
                 
-                self.sendRotationDataToPhone()
+                // Send data only if it's within the sending period
+                if self.isSendingData {
+                    self.sendRotationDataToPhone()
+                }
             }
         } else {
             print("Device Motion is not available.")
@@ -75,6 +92,24 @@ class MotionManager: NSObject, ObservableObject, WCSessionDelegate {
     
     func stopUpdates() {
         motionManager.stopDeviceMotionUpdates()
+    }
+    
+    func startSendingDataForDuration(_ duration: TimeInterval) {
+        isSendingData = true
+        extendedRuntimeSession?.start() // Start extended runtime session
+
+        // Start a timer to stop sending data after the specified duration
+        timer?.invalidate() // Invalidate any existing timer
+        timer = Timer.scheduledTimer(withTimeInterval: duration, repeats: false) { [weak self] _ in
+            self?.stopSendingData()
+        }
+    }
+    
+    private func stopSendingData() {
+        isSendingData = false
+        timer?.invalidate()
+        extendedRuntimeSession?.invalidate() // Invalidate extended runtime session
+        print("Stopped sending data.")
     }
     
     private func setupWatchConnectivity() {
@@ -100,6 +135,11 @@ class MotionManager: NSObject, ObservableObject, WCSessionDelegate {
         session.sendMessage(data, replyHandler: nil) { error in
             print("Failed to send data: \(error.localizedDescription)")
         }
+    }
+    
+    private func setupExtendedRuntimeSession() {
+        extendedRuntimeSession = WKExtendedRuntimeSession()
+        // Not setting the delegate, so we don't need to implement WKExtendedRuntimeSessionDelegate
     }
     
     // MARK: - WCSessionDelegate Methods
