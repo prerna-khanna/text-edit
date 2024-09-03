@@ -2,13 +2,16 @@ import UIKit
 import WatchConnectivity
 import Foundation
 
+enum Granularity {
+    case character, word, line, sentenceCorrection
+}
+
 extension Notification.Name {
     static let didReceiveRotationData = Notification.Name("didReceiveRotationData")
 }
 
 class ViewController: UIViewController, UITextFieldDelegate, WCSessionDelegate, UIDocumentPickerDelegate {
 
-    // IBOutlets for UI elements
     @IBOutlet weak var userIdTextField: UITextField!
     @IBOutlet weak var recordSwitch: UISwitch!
     @IBOutlet weak var messageLabel: UILabel!
@@ -24,108 +27,225 @@ class ViewController: UIViewController, UITextFieldDelegate, WCSessionDelegate, 
     private var wcSession: WCSession?
     private var lastGestureRecognized = false
     private var touchCoordinates: [String] = []
-
     private var gestureRecognition = GestureRecognition(bufferSize: 20)
-    private var currentRotorIndex = 0 // Track the current rotor index
+    private var gestureCount = 0 // Track the number of gestures detected
+    private var selectedGranularity: Granularity = .character // Default granularity
+    private let t5Inference = T5Inference() // Create an instance of T5Inference
 
     override func viewDidLoad() {
         super.viewDidLoad()
         setupUI()
+        
+        // Load the model when the app starts
+        t5Inference.loadModel { success in
+        if success {
+            print("Model loaded successfully.")
+        } else {
+            print("Failed to load the model.")
+        }
+    }
+        
+        
         setupRotationDataObserver()
         setupWatchConnectivity()
 
-        // Add observer for VoiceOver focus changes
         NotificationCenter.default.addObserver(self,
                                                selector: #selector(handleVoiceOverFocusChanged(notification:)),
                                                name: UIAccessibility.elementFocusedNotification,
                                                object: nil)
 
         setupHideKeyboardOnTap()
+        setupCustomActionRotor()
 
-        // Setup custom rotors
-        setupCustomRotors()
+        userInputTextField.delegate = self // Set the delegate for the text field
 
         modeSwitch.addTarget(self, action: #selector(modeSwitchToggled), for: .valueChanged)
         recordButton.addTarget(self, action: #selector(recordButtonTapped), for: .touchUpInside)
         recordSwitch.addTarget(self, action: #selector(toggleRecording(_:)), for: .valueChanged)
+
+        // Continuously monitor text field interaction
+        monitorTextFieldInteraction()
     }
 
-    // Remove labels and custom navigation, implementing custom rotors instead
-    private func setupCustomRotors() {
-        let customWordRotor = UIAccessibilityCustomRotor(name: "Custom Words") { predicate in
-            return self.moveCursor(in: self.userInputTextField, for: predicate, granularity: .word)
-            
-        }
-
-        let customCharRotor = UIAccessibilityCustomRotor(name: "Custom Characters") { predicate in
-            return self.moveCursor(in: self.userInputTextField, for: predicate, granularity: .character)
-        }
-
-        let customLineRotor = UIAccessibilityCustomRotor(name: "Custom Lines") { predicate in
-            return self.moveCursor(in: self.userInputTextField, for: predicate, granularity: .line)
-        }
-        userInputTextField.accessibilityCustomRotors = [customWordRotor, customCharRotor, customLineRotor]
-        print("custom rotor added")
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        // Programmatically select the custom action rotor when the app becomes active
+        print("App has appeared. Re-selecting Custom Action rotor.")
+        reselectCustomActionRotor()
     }
 
-private func moveCursor(in textField: UITextField, for predicate: UIAccessibilityCustomRotorSearchPredicate, granularity: UITextGranularity) -> UIAccessibilityCustomRotorItemResult? {
+    private func setupCustomActionRotor() {
+        let customActionRotor = UIAccessibilityCustomRotor(name: "Custom Action") { predicate in
+            print("Custom Action rotor selected with granularity: \(self.selectedGranularity)")
+            return self.moveCursor(in: self.userInputTextField, for: predicate, granularity: self.selectedGranularity)
+        }
+
+        userInputTextField.accessibilityCustomRotors = [customActionRotor]
+        print("Custom Action rotor added.")
+    }
+
+    func textFieldDidBeginEditing(_ textField: UITextField) {
+        print("Text field did begin editing. Re-selecting Custom Action rotor.")
+        reselectCustomActionRotor()
+    }
+
+    func textFieldDidEndEditing(_ textField: UITextField) {
+        print("Text field did end editing.")
+    }
+
+    private func reselectCustomActionRotor() {
+        if let customActionRotor = userInputTextField.accessibilityCustomRotors?.first(where: { $0.name == "Custom Action" }) {
+            UIAccessibility.post(notification: .screenChanged, argument: customActionRotor.name)
+            print("Custom Action rotor re-selected programmatically.")
+        }
+    }
+
+    private func monitorTextFieldInteraction() {
+        // Add target for all editing-related actions
+        userInputTextField.addTarget(self, action: #selector(textFieldInteraction), for: .editingChanged)
+        userInputTextField.addTarget(self, action: #selector(textFieldInteraction), for: .editingDidBegin)
+        userInputTextField.addTarget(self, action: #selector(textFieldInteraction), for: .editingDidEnd)
+    }
+
+    @objc private func textFieldInteraction() {
+        print("Text field interaction detected. Ensuring Custom Action rotor is active.")
+        reselectCustomActionRotor()
+    }
+
+    @objc private func handleGestureRecognition() {
+        self.gestureCount += 1
+
+        if gestureCount > 4 {
+            gestureCount = 1
+        }
+
+        print("Gesture recognized. Count: \(self.gestureCount)")
+
+        switch gestureCount {
+        case 1:
+            selectedGranularity = .character
+            print("Selected granularity: Character")
+        case 2:
+            selectedGranularity = .word
+            print("Selected granularity: Word")
+        case 3:
+            selectedGranularity = .line
+            print("Selected granularity: Line")
+       case 4:
+            selectedGranularity = .sentenceCorrection
+            print("Selected granularity: Sentence Correction")
+        default:
+            selectedGranularity = .character
+        }
+
+        let rotorName = "Custom \(selectedGranularity)"
+        UIAccessibility.post(notification: .announcement, argument: rotorName)
+        print("\(rotorName) rotor selected programmatically.")
+
+        reselectCustomActionRotor()
+    }
+
+private func correctSentenceInTextField() {
+    DispatchQueue.main.async { [weak self] in
+        guard let self = self, let text = self.userInputTextField.text, !text.isEmpty else {
+            print("No text available for correction.")
+            return
+        }
+
+        self.t5Inference.correctSentence(text) { correctedText in
+            guard let correctedText = correctedText else {
+                print("Failed to correct the sentence.")
+                return
+            }
+
+            // Ensure UI updates are done on the main thread
+            DispatchQueue.main.async {
+                self.userInputTextField.text = correctedText
+                print("Corrected sentence: \(correctedText)")
+            }
+        }
+    }
+}
+
+private func moveCursor(in textField: UITextField, for predicate: UIAccessibilityCustomRotorSearchPredicate, granularity: Granularity) -> UIAccessibilityCustomRotorItemResult? {
     guard let textRange = textField.selectedTextRange else {
         print("No selected text range.")
         return nil
     }
-    
+
     var currentPosition = predicate.searchDirection == .next ? textRange.end : textRange.start
     let offset = predicate.searchDirection == .next ? 1 : -1
-    
-    print("Current position: \(currentPosition), Direction: \(predicate.searchDirection == .next ? "Forward" : "Backward")")
-    
-    if granularity == .character {
-        // Simple movement for characters by offset
+
+    print("Moving cursor in direction: \(predicate.searchDirection == .next ? "Next" : "Previous") with granularity: \(granularity)")
+
+    switch granularity {
+    case .character:
         if let newPosition = textField.position(from: currentPosition, offset: offset) {
-            if let charRange = textField.textRange(from: newPosition, to: newPosition) {
-                print("Moving to character at position: \(newPosition)")
-                textField.selectedTextRange = charRange
-                return UIAccessibilityCustomRotorItemResult(targetElement: textField, targetRange: nil)
-            }
+            textField.selectedTextRange = textField.textRange(from: newPosition, to: newPosition)
+            print("Moved cursor by character to new position.")
+            return UIAccessibilityCustomRotorItemResult(targetElement: textField, targetRange: textField.selectedTextRange)
         }
-        
-        print("Failed to move to the next or previous character.")
-        return nil
-    }
-    
-    // Handle word granularity
-    while true {
-        if let newRange = textField.tokenizer.rangeEnclosingPosition(currentPosition, with: .word, inDirection: predicate.searchDirection == .next ? .storage(.forward) : .storage(.backward)) {
-            if (predicate.searchDirection == .next && newRange.start == currentPosition) ||
-               (predicate.searchDirection == .previous && newRange.end == currentPosition) {
-                print("Stuck at the same position, trying to adjust.")
+    case .word, .line:
+        let direction: UITextDirection = predicate.searchDirection == .next ? UITextDirection.storage(.forward) : UITextDirection.storage(.backward)
+        let boundary: UITextGranularity = (granularity == .word) ? .word : .line
+
+        while true {
+            if let newRange = textField.tokenizer.rangeEnclosingPosition(currentPosition, with: boundary, inDirection: direction) {
+                if (predicate.searchDirection == .next && newRange.start == currentPosition) ||
+                   (predicate.searchDirection == .previous && newRange.end == currentPosition) {
+                    if let adjustedPosition = textField.position(from: currentPosition, offset: offset) {
+                        currentPosition = adjustedPosition
+                        print("Adjusted position due to no movement. Current position: \(currentPosition)")
+                        continue
+                    } else {
+                        break
+                    }
+                }
+                textField.selectedTextRange = newRange
+                print("Moved cursor by \(granularity) to new range.")
+                return UIAccessibilityCustomRotorItemResult(targetElement: textField, targetRange: newRange)
+            } else {
                 if let adjustedPosition = textField.position(from: currentPosition, offset: offset) {
                     currentPosition = adjustedPosition
+                    print("Adjusted position due to no range found. Current position: \(currentPosition)")
                     continue
                 } else {
-                    print("Failed to adjust position.")
                     break
                 }
             }
-            
-            print("Moving to word range: Start = \(newRange.start), End = \(newRange.end)")
-            textField.selectedTextRange = newRange
-            return UIAccessibilityCustomRotorItemResult(targetElement: textField, targetRange: nil)
-        } else {
-            print("Failed to find range, adjusting position incrementally.")
-            if let adjustedPosition = textField.position(from: currentPosition, offset: offset) {
-                currentPosition = adjustedPosition
-                continue
-            } else {
-                print("No more positions available, breaking.")
-                break
-            }
         }
+    case .sentenceCorrection:
+        if predicate.searchDirection == .next {
+            print("Sentence correction triggered, correcting sentence.")
+            let sentenceToCorrect = textField.text ?? ""
+            t5Inference.correctSentence(sentenceToCorrect) { [weak self] correctedSentence in
+                guard let self = self else { return }
+                if let correctedSentence = correctedSentence {
+                    print("Corrected sentence: \(correctedSentence)")
+                    DispatchQueue.main.async {
+                        self.userInputTextField.text = correctedSentence
+                        self.moveCursorToEnd()
+                    }
+                } else {
+                    print("Failed to correct the sentence.")
+                }
+            }
+        } else {
+            print("Sentence correction canceled, no changes made.")
+        }
+        return nil
     }
-    
-    print("Failed to move to the next or previous word.")
+
+    print("Failed to move the cursor.")
     return nil
 }
+
+private func moveCursorToEnd() {
+    let endPosition = userInputTextField.endOfDocument
+    userInputTextField.selectedTextRange = userInputTextField.textRange(from: endPosition, to: endPosition)
+    print("Cursor moved to end of text.")
+}
+
 
 
 
@@ -306,7 +426,8 @@ private func moveCursor(in textField: UITextField, for predicate: UIAccessibilit
                 
                 if gestureRecognized {
                     if !lastGestureRecognized {
-                        moveToNextRotor()
+                        //moveToNextRotor()
+                        handleGestureRecognition()
                     }
                     lastGestureRecognized = true
                 } else {
@@ -323,7 +444,7 @@ private func moveCursor(in textField: UITextField, for predicate: UIAccessibilit
         }
     }
 
-    private func moveToNextRotor() {
+    /*private func moveToNextRotor() {
         guard let rotors = userInputTextField.accessibilityCustomRotors, !rotors.isEmpty else {
             print("No custom rotors available.")
             return
@@ -334,7 +455,7 @@ private func moveCursor(in textField: UITextField, for predicate: UIAccessibilit
         
         UIAccessibility.post(notification: .announcement, argument: nextRotor.name)
         // The rotor will change based on the announcement, we assume here
-    }
+    }*/
 
     func setupHideKeyboardOnTap() {
         let tapGesture = UITapGestureRecognizer(target: self, action: #selector(hideKeyboard))

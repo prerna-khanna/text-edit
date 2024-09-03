@@ -93,7 +93,7 @@ class GestureRecognition {
                                        dtw[i - 1][j - 1])    // Match
             }
         }
-        print(dtw[m][n])
+        //print(dtw[m][n])
         
         return dtw[m][n]
     }

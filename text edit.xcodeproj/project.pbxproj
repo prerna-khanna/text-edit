@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		65DA9AD92C86681700F9B61C /* T5Inference.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65DA9AD82C86681700F9B61C /* T5Inference.swift */; };
 		65E7AED02BFE6FA300B31DBF /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65E7AECF2BFE6FA300B31DBF /* AppDelegate.swift */; };
 		65E7AED22BFE6FA300B31DBF /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65E7AED12BFE6FA300B31DBF /* SceneDelegate.swift */; };
 		65E7AED42BFE6FA300B31DBF /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65E7AED32BFE6FA300B31DBF /* ViewController.swift */; };
@@ -49,6 +50,7 @@
 /* Begin PBXFileReference section */
 		652EEB952C699551001F99A4 /* WatchConnectivity.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WatchConnectivity.framework; path = System/Library/Frameworks/WatchConnectivity.framework; sourceTree = SDKROOT; };
 		652EEB972C69958C001F99A4 /* WatchConnectivity.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WatchConnectivity.framework; path = Platforms/WatchOS.platform/Developer/SDKs/WatchOS10.5.sdk/System/Library/Frameworks/WatchConnectivity.framework; sourceTree = DEVELOPER_DIR; };
+		65DA9AD82C86681700F9B61C /* T5Inference.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = T5Inference.swift; sourceTree = "<group>"; };
 		65E7AECC2BFE6FA300B31DBF /* text edit.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "text edit.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		65E7AECF2BFE6FA300B31DBF /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		65E7AED12BFE6FA300B31DBF /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -125,6 +127,7 @@
 				65E7AED82BFE6FA400B31DBF /* Assets.xcassets */,
 				65E7AEDA2BFE6FA400B31DBF /* LaunchScreen.storyboard */,
 				65E7AEDD2BFE6FA400B31DBF /* Info.plist */,
+				65DA9AD82C86681700F9B61C /* T5Inference.swift */,
 			);
 			path = "text edit";
 			sourceTree = "<group>";
@@ -255,6 +258,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				65E7AED42BFE6FA300B31DBF /* ViewController.swift in Sources */,
+				65DA9AD92C86681700F9B61C /* T5Inference.swift in Sources */,
 				65E7AED02BFE6FA300B31DBF /* AppDelegate.swift in Sources */,
 				65E7AED22BFE6FA300B31DBF /* SceneDelegate.swift in Sources */,
 				65FA14A32C7688C8004C85E8 /* GestureRecognition.swift in Sources */,
