@@ -2,7 +2,7 @@ import Foundation
 
 class T5Inference {
     private let apiUrl = "https://api-inference.huggingface.co/models/vennify/t5-base-grammar-correction"
-    private let apiKey = "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" // Replace with your actual Hugging Face API token
+    private let apiKey = "" // Replace with your actual Hugging Face API token
     private let maxRetries = 5
     private let retryDelay: TimeInterval = 5.0 // Retry after 5 seconds
     private var isModelLoaded = false
